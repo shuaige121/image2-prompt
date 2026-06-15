@@ -1,0 +1,16 @@
+# Photography prompt taxonomy
+
+| Genre | Sub-categories | When to use |
+|---|---|---|
+| **Food & Beverage** (`food_beverage`) | Menu/delivery catalog · Editorial dark-and-moody · Fine-dining hero · Flat-lay/overhead spread · Beverage/cocktail · Dessert · Street food/documentary | Subject is edible/drinkable; goal is appetizing realism, not a render. |
+| **Portrait & People** (`portrait_people`) | Candid lifestyle · Studio headshot · Environmental portrait · Group portrait · Beauty/macro closeup · Anti-uncanny skin booster (append) | One+ humans where likeness, skin, expression, or pose is the point. |
+| **Product / Commercial / E-Commerce** (`product_commercial_ecommerce`) | White-bg pack-shot (Amazon) · Lifestyle in-scene hero · Macro detail/texture · Flat-lay · Jewelry/reflective · Cosmetics/skincare · Floating/levitation | Subject IS a physical product to sell or advertise. |
+| **Landscape & Nature** (`landscape_nature`) | Golden-hour mountain vista · Seascape/coastal · Long-exposure water (silk) · Forest/woodland · Minimalist/negative space · Desert/dunes · Blue hour/night sky | Outdoor scene, no central human; goal is depth, light, place. |
+| **Architecture / Interior / Real-Estate** (`architecture-interior-realestate`) | Interior room · Building exterior (golden hour) · Twilight/dusk (blue hour) · Architectural detail · Wide-angle small space · Open-plan establishing | Subject is a building, room, or property listing. |
+| **Street / Documentary** (`street_documentary`) | Daytime candid (35mm) · B&W reportage (Tri-X) · Night/neon (800T) · Motion/panning blur · Hard-flash close-up · Environmental/market · Crowd/protest from the hip | Candid, unposed, real-world human moments; caught not staged. |
+| **Still Life** (`still_life`) | Classic tabletop grouping · Dark/moody chiaroscuro · Overhead flat-lay · Floral (Dutch Golden Age) · Vanitas/symbolic · Bright airy/Scandinavian · Macro detail/fragment | Arranged inanimate objects on a surface; composed, painterly look. |
+| **Fashion & Beauty Editorial** (`fashion-beauty-editorial`) | Studio editorial (seamless) · On-location (natural light) · Beauty close-up · Lookbook/e-com on-model · Ghost-mannequin/flat-lay · High-fashion (gels/hard light) | Styled human modeling clothing, makeup, hair, or accessories. |
+| **Wildlife & Animals** (`wildlife-animals`) | Telephoto mammal portrait · Environmental animalscape · Bird in flight · Bird on perch · Pet portrait · Macro insect · Underwater/wet · Snow/cold-weather | Live animal; user wants a believable photo, not an illustration. |
+| **Event & Wedding** (`event-wedding`) | Ceremony candid · Aisle/processional wide · Reception/dance floor (shutter drag) · Golden-hour couple · Detail flat-lay · Getting-ready candid · Speeches & toasts | Wedding/live event; real moments and mixed venue light matter. |
+| **Automotive** (`automotive`) | Studio hero (cyc wall) · Rolling/motion · Detail/macro · Lifestyle on-location · Off-road/dirty action · Night/city lights | Subject is a car, motorcycle, or vehicle. |
+| **Macro / Close-Up** (`macro`) | Food (crumb/steam) · Food (liquid/droplet) · Jewelry/gem · Cosmetics/liquid · Material/texture · Insect/dewdrop · Flower/botanical · Abstract texture fill | Subject fills frame at extreme range; the point IS the micro-texture. |

@@ -1,8 +1,10 @@
-# image2-foodshots
+# photo-prompt-kit
 
-A small toolkit for generating **photorealistic, non-uncanny food photography** with OpenAI's **gpt-image-2** (the `image_gen` tool reachable through Codex), plus a battle-tested bilingual prompt library and example outputs.
+Paste-ready, **anti-uncanny prompts for gpt-image-2** (OpenAI "Image 2" / the Codex `image_gen` tool) across **12 photography genres** — Food, Portrait, Product, Landscape, Architecture, Street, Still Life, Fashion, Wildlife, Event/Wedding, Automotive, Macro.
 
-The whole project exists because of one hard-won lesson: with gpt-image-2, **food looks fake when you prompt it like a render and real when you prompt it like a camera.** Words like `studio product photo`, `pure white background`, `8k`, `vibrant`, `high detail` produce flat, oversaturated, depth-less, uncanny-valley food. Camera language — lens + aperture, shallow depth of field, film stock, soft window light — produces something that looks shot, not generated.
+It's also a **Claude skill**: load [`SKILL.md`](SKILL.md) and any agent immediately sees the genre "interfaces" (top-level category → sub-categories → when-to-use), then drills into [`recipes/<genre>.md`](recipes/) for the full shot-brief. See [`TAXONOMY.md`](TAXONOMY.md) for the one-screen map.
+
+The whole thing exists because of one hard-won lesson with gpt-image-2: **subjects look fake when you prompt them like a render and real when you prompt them like a camera.** Words like `studio product photo`, `pure white background`, `8k`, `vibrant`, `high detail` produce flat, oversaturated, depth-less, uncanny-valley images. Camera language — named lens + aperture, shallow depth of field, film stock, one soft light direction — produces something that looks *shot*, not generated. Food is the worked example below; every other genre follows the same rule in `recipes/`.
 
 ## What's inside
 
