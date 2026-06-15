@@ -1,0 +1,12 @@
+name = "img2-counter"
+main = "worker.js"
+compatibility_date = "2026-06-01"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "<YOUR_KV_NAMESPACE_ID>"
+
+[vars]
+COOLDOWN_THRESHOLD = "12"
+COOLDOWN_WINDOW_MIN = "40"
+COOLDOWN_MIN = "45"

@@ -32,6 +32,17 @@ Read this **before batching**. Two billing paths exist; they have very different
 - `python3 scripts/image2.py --usage` prints: 5h & 7d window %, today / last-7d image counts (this device), and cross-device totals.
 - Cross-device counter = a Cloudflare Worker + KV. Its config (`{endpoint, token, device}`) lives **outside** the repo at `$CODEX_HOME/image2-counter.json` — **never commit it**. All counter calls are best-effort; offline → silently skipped.
 
+### Shared cooldown gate (same Worker)
+
+The counter Worker also tracks a **shared, cross-device cooldown** so any device/agent can check *before* generating whether the account is about to hit the silent throttle:
+
+- `GET /check` → `{safe, in_cooldown, recent_in_window, threshold, window_min, cooldown_remaining_sec, cooldown_until_iso}` (read-only).
+- `POST /gen {device}` → records one generation event into the rolling window; returns the same status.
+
+Tunables (Worker `vars`): `COOLDOWN_THRESHOLD` (default **12**), `COOLDOWN_WINDOW_MIN` (**40**), `COOLDOWN_MIN` (**45**) → ≥12 gens in any 40-min window locks ~45 min, **shared across all devices**.
+
+`image2.py` wires it automatically: `POST /gen` after every saved image, a **warning at batch start if a shared cooldown is active**, and the gate state in `--usage` (`cooldown gate: clear (N/12 in last 40min)`). Other tools/agents can call `GET /check` directly. Worker source + deploy notes: [`worker/`](worker/).
+
 ## OpenAI API pricing (the other path) — verified June 2026
 
 Priced **per output token** (image tokens scale with quality × size); per-image $ are OpenAI's own published estimates. **`gpt-image-2` is a real model ID** (image output **$30/1M** tokens, text input $5/1M, image input **$8/1M**, cached image input $1.25/1M).

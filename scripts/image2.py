@@ -247,6 +247,29 @@ def counter_summary() -> str | None:
     return line
 
 
+def cooldown_check() -> dict | None:
+    """Read-only shared cooldown gate (GET /check); None if no counter configured."""
+    return _counter_call("GET", "/check")
+
+
+def cooldown_event(n: int = 1) -> None:
+    """Record n generation events into the shared cooldown window (best-effort)."""
+    dev = (_counter_cfg() or {}).get("device", "unknown")
+    for _ in range(max(1, n)):
+        _counter_call("POST", "/gen", {"device": dev})
+
+
+def cooldown_line() -> str | None:
+    st = cooldown_check()
+    if not st:
+        return None
+    if st.get("in_cooldown"):
+        mins = (st.get("cooldown_remaining_sec", 0) + 59) // 60
+        return (f"⏳ SHARED COOLDOWN: {st.get('recent_in_window')} gens in last "
+                f"{st.get('window_min')}min — wait ~{mins}min (until {st.get('cooldown_until_iso', '?')})")
+    return f"cooldown gate: clear ({st.get('recent_in_window')}/{st.get('threshold')} in last {st.get('window_min')}min)"
+
+
 def format_usage(rl: dict | None) -> str:
     if not rl:
         return "usage: (no rate-limit data found yet)"
@@ -430,6 +453,7 @@ def do_job(job: dict, args) -> dict:
                 shutil.copy2(src, dest)
                 saved.append(str(dest))
             result.update(ok=True, files=saved)
+            cooldown_event(len(saved))  # record into shared cooldown window (best-effort)
             log(f"  ✔ {name} -> {', '.join(saved)}  ({time.time()-t0:.0f}s)")
             return result
         log(f"  ✘ {name} attempt {attempt} produced no image ({time.time()-t0:.0f}s)"
@@ -495,10 +519,20 @@ def main() -> None:
         shared = counter_summary()
         if shared:
             print(shared)
+        cl = cooldown_line()
+        if cl:
+            print(cl)
         return
 
     jobs = load_jobs(args)
     Path(args.out_dir).mkdir(parents=True, exist_ok=True)
+
+    gate = cooldown_check()
+    if gate and gate.get("in_cooldown"):
+        mins = (gate.get("cooldown_remaining_sec", 0) + 59) // 60
+        log(f"⏳ SHARED COOLDOWN active: {gate.get('recent_in_window')} gens in last "
+            f"{gate.get('window_min')}min across all devices — server likely to silently refuse. "
+            f"Suggest waiting ~{mins}min (until {gate.get('cooldown_until_iso','?')}).")
 
     pre = latest_rate_limits()
     if str(args.concurrency).lower() == "auto":
