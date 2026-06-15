@@ -1,59 +1,57 @@
 // img2-counter — shared cross-device image-gen counter + cooldown gate.
 // Endpoints (all require Bearer AUTH_TOKEN):
-//   POST /report {device,date,count}   absolute daily count per device (idempotent)
-//   GET  /day?date=YYYY-MM-DD          sum across devices
-//   GET  /week?end=YYYY-MM-DD          last 7 days
-//   GET  /check                        read-only: is it safe to generate now?
-//   POST /gen {device?}                record ONE generation event, return fresh status
-// Cooldown model (matches gpt-image-2 / Codex empirical anti-abuse throttle):
-//   if >= THRESHOLD gens in the last WINDOW minutes  -> locked for COOLDOWN minutes.
+//   POST /gen {device?}              record ONE generation event, return fresh status
+//   GET  /check                      read-only: is it safe to generate now?
+//   POST /report {device,date,count} absolute daily count per device (idempotent)
+//   GET  /day?date / GET /week
+//
+// Cooldown = pure SLIDING WINDOW: at most THRESH generations per WINDOW, shared
+// across all devices. cooldown_until is anchored to the EVENT timestamps (not call
+// time) so it counts down monotonically. Events live in ONE KV key (read-your-write
+// = fast, accurate for the sequential case). Tune THRESH/WINDOW_MIN below.
+const THRESH = 12;
+const WINDOW_MIN = 45;
+const WINDOW_MS = WINDOW_MIN * 60000;
+
 export default {
   async fetch(req, env) {
     const auth = req.headers.get("authorization") || "";
     if (auth !== `Bearer ${env.AUTH_TOKEN}`) return new Response("unauthorized", { status: 401 });
     const url = new URL(req.url);
 
-    const THRESH = parseInt(env.COOLDOWN_THRESHOLD || "12", 10);
-    const WINDOW_MS = parseInt(env.COOLDOWN_WINDOW_MIN || "40", 10) * 60000;
-    const COOLDOWN_MS = parseInt(env.COOLDOWN_MIN || "45", 10) * 60000;
-
     const getRecent = async () => {
       const raw = await env.KV.get("gen:recent");
-      const cutoff = Date.now() - 3600000; // keep last hour
-      return (raw ? JSON.parse(raw) : []).filter((t) => t >= cutoff);
+      const cutoff = Date.now() - WINDOW_MS - 600000; // keep window + 10min slack
+      return (raw ? JSON.parse(raw) : []).filter((t) => t >= cutoff).sort((a, b) => a - b);
     };
+
     const status = async () => {
       const now = Date.now();
-      const arr = await getRecent();
-      const inWin = arr.filter((t) => t >= now - WINDOW_MS).length;
-      const storedUntil = parseInt((await env.KV.get("cooldown:until")) || "0", 10);
-      const hitThresh = inWin >= THRESH;
-      const cdUntil = hitThresh ? Math.max(storedUntil, now + COOLDOWN_MS) : storedUntil;
+      const win = (await getRecent()).filter((t) => t >= now - WINDOW_MS);
+      const n = win.length;
+      const hit = n >= THRESH;
+      // count drops below THRESH once win[n-THRESH] ages out of the window:
+      const cdUntil = hit ? win[n - THRESH] + WINDOW_MS : 0;
       const inCooldown = now < cdUntil;
       return {
         safe: !inCooldown,
         in_cooldown: inCooldown,
-        cooldown_until: cdUntil,
-        cooldown_until_iso: cdUntil ? new Date(cdUntil).toISOString() : null,
-        cooldown_remaining_sec: Math.max(0, Math.ceil((cdUntil - now) / 1000)),
-        recent_in_window: inWin,
-        window_min: WINDOW_MS / 60000,
+        cooldown_until: inCooldown ? cdUntil : 0,
+        cooldown_until_iso: inCooldown ? new Date(cdUntil).toISOString() : null,
+        cooldown_remaining_sec: inCooldown ? Math.ceil((cdUntil - now) / 1000) : 0,
+        recent_in_window: n,
         threshold: THRESH,
-        suggest_wait_sec: inCooldown ? Math.max(0, Math.ceil((cdUntil - now) / 1000)) : 0,
+        window_min: WINDOW_MIN,
         now,
       };
     };
 
-    // POST /gen — record an event then return status
     if (req.method === "POST" && url.pathname === "/gen") {
       const arr = await getRecent();
       arr.push(Date.now());
       await env.KV.put("gen:recent", JSON.stringify(arr), { expirationTtl: 7200 });
-      const st = await status();
-      if (st.in_cooldown) await env.KV.put("cooldown:until", String(st.cooldown_until), { expirationTtl: 7200 });
-      return Response.json(st);
+      return Response.json(await status());
     }
-    // GET /check — read-only gate
     if (req.method === "GET" && url.pathname === "/check") return Response.json(await status());
 
     // ---- existing daily counter (unchanged) ----
@@ -68,7 +66,7 @@ export default {
       return Response.json({ ok: true, device, date, count });
     }
     if (req.method === "GET" && url.pathname === "/day") {
-      let date = url.searchParams.get("date") || new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10);
+      const date = url.searchParams.get("date") || new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10);
       const list = await env.KV.list({ prefix: `c:${date}:` });
       const devices = {}; let total = 0;
       for (const k of list.keys) {

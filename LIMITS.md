@@ -41,7 +41,7 @@ The counter Worker also tracks a **shared, cross-device cooldown** so any device
 
 Tunables (Worker `vars`): `COOLDOWN_THRESHOLD` (default **12**), `COOLDOWN_WINDOW_MIN` (**40**), `COOLDOWN_MIN` (**45**) → ≥12 gens in any 40-min window locks ~45 min, **shared across all devices**.
 
-`image2.py` wires it automatically: `POST /gen` after every saved image, a **warning at batch start if a shared cooldown is active**, and the gate state in `--usage` (`cooldown gate: clear (N/12 in last 40min)`). Other tools/agents can call `GET /check` directly. Worker source + deploy notes: [`worker/`](worker/).
+`image2.py` wires it automatically: `POST /gen` after every saved image, a **warning at batch start if a shared cooldown is active**, and the gate state in `--usage` (`cooldown gate: clear (N/12 in last 45min)`). Other tools/agents can call `GET /check` directly. Worker source + deploy notes: [`worker/`](worker/).
 
 ## OpenAI API pricing (the other path) — verified June 2026
 
