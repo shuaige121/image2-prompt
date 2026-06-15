@@ -12,6 +12,10 @@ description: >-
   or extreme crumb/dewdrop/gem/texture macro — and needs it to read as a real photograph, not a render.
   Each genre ships paste-ready shot-brief snippets, named lens + aperture + light + angle defaults,
   a banned-words list, and img2img/reference notes. Drill into recipes/<genre>.md for the full recipe.
+  Also bundles a generator (scripts/image2.py, with a --concurrency limiter + --usage counter), a macOS
+  Apple-Vision cutout to transparent PNG (scripts/cutout.swift), rate-limit/cooldown/pricing docs (LIMITS.md),
+  and an output-organization convention (OUTPUTS.md) — so a calling agent knows the limits, can set max
+  parallelism, can auto-cut subjects to transparent PNG, and knows how to file the results.
 ---
 
 # photo-prompt-kit
@@ -123,3 +127,10 @@ This kit is the prompt half. To render, pair it with a gpt-image-2 runner:
 - Or any OpenAI Images API client (see `RESOURCES.md`).
 
 Workflow: pick genre -> open `recipes/<genre>.md` -> copy the sub-category snippet -> fill `[brackets]` -> (optional) add a reference image with `--ref` + that genre's img2img clause -> generate -> if it looks AI, check you didn't use a banned word.
+
+## Tooling, limits & outputs
+
+- **Generate:** `scripts/image2.py` (gpt-image-2 via Codex; text2img + img2img `--ref`). Pin max parallelism with `--concurrency N`.
+- **Limits & cost — read [`LIMITS.md`](LIMITS.md) BEFORE batching:** the undocumented Codex **anti-abuse cooldown** (~13 images / 40 min burst → 30–60 min silent lockout; pace **≤10–12 images / 30 min**), the `--concurrency` limiter (auto-backs-off on the 5h window), the `--usage` counter (5h/7d windows + per-device & cross-device totals), the OpenAI **API pricing** table (gpt-image-2 ≈ $0.006/$0.05/$0.21 low/med/high at 1024²) and **IPM/TPM tier limits**. The Codex-subscription path has no per-image charge and the API tier limits don't apply.
+- **Cutout → transparent PNG:** `scripts/cutout.swift` (macOS 14+, Apple Vision subject lift — same as press-and-hold "copy subject"). `swift scripts/cutout.swift in.png out.png`. Pair generate→cutout for reusable composite-ready assets (Linux: use `rembg`).
+- **Organize outputs:** [`OUTPUTS.md`](OUTPUTS.md) — `outputs/<genre>/<project>/` layout mirroring the taxonomy, naming convention, a `manifest.jsonl` provenance line per image, and the generate→cutout→record automation loop.
