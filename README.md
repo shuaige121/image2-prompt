@@ -63,7 +63,12 @@ Requires a working Codex CLI with image_gen access.
 
 ## Credits / built on
 
-Distilled from the OpenAI Cookbook image-generation prompting guide and community projects. (See the credits section — populated from an ongoing survey of existing gpt-image-2 tooling.)
+The food recipe and img2img patterns are distilled from the **[OpenAI Cookbook image-generation prompting guide](https://developers.openai.com/cookbook/examples/multimodal/image-gen-models-prompting-guide)** plus a survey of existing community tooling — see **[`RESOURCES.md`](RESOURCES.md)** for the full curated list (36 repos). Reuse the wheels; don't reinvent them. Highlights:
+
+- Prompt corpora: [EvoLinkAI/awesome-gpt-image-2-API-and-Prompts](https://github.com/EvoLinkAI/awesome-gpt-image-2-API-and-Prompts) (CC0), [YouMind-OpenLab/awesome-gpt-image-2](https://github.com/YouMind-OpenLab/awesome-gpt-image-2), [ZeroLu/awesome-gpt-image](https://github.com/ZeroLu/awesome-gpt-image)
+- Same-shape Codex generators worth studying: [aldegad/image-gen](https://github.com/aldegad/image-gen), [buluslan/gpt-image2-ecommerce](https://github.com/buluslan/gpt-image2-ecommerce) (25 "product-in-scene" templates), [wuyoscar/GPT-Image2-Skill](https://github.com/wuyoscar/GPT-Image2-Skill)
+- Compositing / cutout pipeline (for img2img prep): [danielgatis/rembg](https://github.com/danielgatis/rembg), [lllyasviel/IC-Light](https://github.com/lllyasviel/IC-Light) (relight to match a scene), [Sanster/IOPaint](https://github.com/Sanster/IOPaint)
+- Reference sourcing: [deedy5/ddgs](https://github.com/deedy5/ddgs), [mikf/gallery-dl](https://github.com/mikf/gallery-dl)
 
 ## License
 
