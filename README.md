@@ -46,9 +46,44 @@ Match lighting, scale, shadow, and perspective. Do not restyle it.
 
 Mechanics (gpt-image-2): no `input_fidelity` param (inputs are always high-fidelity); a mask hits the **first** image only; max 16 input images.
 
-## Example
+## Before / after
 
-`examples/c1-balanced-set.png` — four steamed buns in one bamboo steamer, each cut open to reveal a different real filling (minced pork / curry chicken / braised eggplant / bok-choy & shiitake), generated img2img from the real product photos with the recipe above. Note the depth of field and the muted, filmic color — no oversaturation, no uncanny sheen.
+**Same bun, two prompts — the only difference is the words:**
+
+![render-spam vs recipe](examples/before-after-prompt.png)
+
+Left: `studio photo, white background, 8k, vibrant, masterpiece` → flat, white, everything in focus, studio-fake. Right: `50mm at f2.0, shallow depth of field, soft window light, Kodak Portra 400` → real depth of field, natural color, reads like a photograph. Nothing else changed.
+
+**A real deliverable — a menu combo image:**
+
+![before/after menu combo](examples/before-after-menu.png)
+
+Po Xiao Man's "Balanced Set" went from a 2×2 collage of separate shots to one depth-of-field photo with the actual product fillings (img2img from the real bun photos + the recipe). `examples/c1-balanced-set.png` is the full-res "after" — note the depth of field and muted, filmic color; no oversaturation, no uncanny sheen.
+
+## Cost — subscription vs API
+
+Two ways to drive gpt-image-2, very different economics:
+
+| | ChatGPT / Codex subscription (this kit's `image2.py`) | OpenAI API |
+|---|---|---|
+| Per-image charge | **none** — included in the plan | per output token |
+| gpt-image-2 @ 1024² | — | ~**$0.006 / $0.05 / $0.21** (low / med / high) |
+| Real ceiling | undocumented **cooldown** (~13 imgs / 40 min → 30–60 min lockout; pace ≤10–12 / 30 min) | tier **IPM/TPM** (Tier 1 = 5 img/min … Tier 5 = 250) |
+| Best for | moderate / manual volume, cost-free marginal images | high-volume, parallel, automated pipelines |
+
+**Breakeven:** a ~US$220/month plan ≈ **1,000 high-quality 1024² images/month** on the API. Below that, pay-per-use API is cheaper (and has no cooldown); above it, the subscription wins — and since the plan covers far more than images, the marginal cost of a subscription image is effectively **$0**. Full numbers + sources in [`LIMITS.md`](LIMITS.md).
+
+## Automation — before / after
+
+| | Before (manual) | After (this kit) |
+|---|---|---|
+| Prompt | ad-hoc render-spam → uncanny output | genre recipe snippet, fill the brackets |
+| Volume | one at a time, eyeball each | `image2.py` parallel batches, `--concurrency N`, cooldown-aware |
+| Cutout | hand-mask in an editor | `cutout.swift` (Apple Vision) → transparent PNG in one call |
+| Provenance | none — can't reproduce | a `manifest.jsonl` line per image (prompt, refs, genre) |
+| Filing | a flat folder of `final_v3_FINAL.png` | `outputs/<genre>/<project>/` mirroring the taxonomy |
+
+The loop is **recipe → generate (parallel) → cut to transparent PNG → record** (see [`OUTPUTS.md`](OUTPUTS.md)). Pairing generation with automatic cutout is what raises the end-to-end automation rate: every run yields both the hero photo *and* a reusable transparent asset.
 
 ## Quick start
 
