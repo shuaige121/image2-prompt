@@ -1,5 +1,5 @@
 ---
-name: photo-prompt-kit
+name: image2-prompt
 description: >-
   Write realistic, anti-uncanny prompts for gpt-image-2 (OpenAI "Image 2") photography across 12 genres:
   Food & Beverage, Portrait & People, Product/Commercial/E-Commerce, Landscape & Nature,
@@ -18,7 +18,7 @@ description: >-
   parallelism, can auto-cut subjects to transparent PNG, and knows how to file the results.
 ---
 
-# photo-prompt-kit
+# image2-prompt
 
 Paste-ready, anti-uncanny prompts for **gpt-image-2** photography. Pick a genre below, grab the
 matching sub-category snippet, fill the brackets, ship. Snippets are shot briefs — specify, don't praise.

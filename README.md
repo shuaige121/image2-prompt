@@ -1,4 +1,4 @@
-# photo-prompt-kit
+# image2-prompt
 
 Paste-ready, **anti-uncanny prompts for gpt-image-2** (OpenAI "Image 2" / the Codex `image_gen` tool) across **12 photography genres** — Food, Portrait, Product, Landscape, Architecture, Street, Still Life, Fashion, Wildlife, Event/Wedding, Automotive, Macro.
 
