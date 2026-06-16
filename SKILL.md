@@ -11,7 +11,8 @@ description: >-
   telephoto/bird/pet/insect wildlife, ceremony/reception/detail wedding, hero/rolling/detail car shots,
   or extreme crumb/dewdrop/gem/texture macro — and needs it to read as a real photograph, not a render.
   Each genre ships paste-ready shot-brief snippets, named lens + aperture + light + angle defaults,
-  a banned-words list, and img2img/reference notes. Drill into recipes/<genre>.md for the full recipe.
+  a banned-words list, and img2img/reference notes. FIRST pick a mode — Precise Control (adherence) vs
+  Evocative/意境 (resonance) — in recipes/MODES.md, then drill into recipes/<genre>.md for the full recipe.
   Also bundles a generator (scripts/image2.py, with a --concurrency limiter + --usage counter), a macOS
   Apple-Vision cutout to transparent PNG (scripts/cutout.swift), rate-limit/cooldown/pricing docs (LIMITS.md),
   and an output-organization convention (OUTPUTS.md) — so a calling agent knows the limits, can set max
@@ -31,6 +32,24 @@ condensation, scuffs, stray hairs, wrinkles, dust). Say "real photograph" so the
 **Never use** `8k / 4k / masterpiece / hyper-detailed / studio lighting / cinematic / vibrant / stunning /
 flawless / octane / unreal engine / award-winning` — these are the AI/CGI tells. Every genre file carries
 its own full banned-words list; honor it.
+
+## Step 0 — pick a mode (the calling LLM chooses; no default)
+
+Before the genre, decide **what you're optimizing**. Full guide: **[`recipes/MODES.md`](recipes/MODES.md)**.
+
+- **🎯 Precise Control (精确控制)** — optimize *adherence* (image must obey the prompt). For product, identity/likeness, brand consistency, exact composition, matching a reference. Control-heavy; pass `--ref`.
+- **🌫️ Evocative (意境圆满)** — optimize *resonance* (image must make people feel). For editorial, mood, story, hero/atmosphere shots. Intent-heavy; keep the implied scene simple & renderable.
+
+These are the field's two fundamental axes (alignment vs human-preference) — they trade off, don't max both. Pick by the subject's **story-capacity**: can it carry a feeling (people/scenes/evocative food → Evocative) or not (lone product/icon → Precise Control)?
+
+| word budget | 🎯 Precise Control | 🌫️ Evocative |
+|---|---|---|
+| Intent (mood/message/narrative) | ~15% | **~50%** |
+| Subject + specifics | ~30% | ~25% |
+| Control (lens/light/angle) | **~35%** | ~15% |
+| Constraints | ~20% | ~10% |
+
+*(ratios provisional — being calibrated by an ongoing intent×genre experiment.)* One subject < ~110 words either way. Then pick a genre below and compose at your mode's ratio.
 
 ## Genres (interface)
 
