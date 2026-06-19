@@ -69,3 +69,18 @@ Three findings that change how you compose:
 1. **Always spend first on concrete subject specifics** — "who/what exactly" (a 70-yr-old weathered face & calloused hands / a faceted bottle, amber liquid, brushed-gold cap) is the single highest-ROI sentence and it raises *all six* quality axes at once. This is mode-independent.
 2. **Intent buys resonance, NOT realism** — it drives emotion (+1.8), and also depth & light, but barely touches realism (+0.1). This is the empirical proof of the two-mode split: want *feeling* → spend on intent (Evocative); want it to *look real/exact* → spend on subject+lens+texture (Precise Control). Don't expect intent to fix an unconvincing render.
 3. **Deliver light through intent, not through a lighting spec** — a technical light sentence alone is net-negative (−0.12), yet intent words raise the *light* axis +1.0. "the stillness of a quiet morning ritual" out-lights "soft diffused side light from the left." So: drop standalone f-stop/key-light lines; let mood/scene imply the light. (Texture words are a double-edged trade — realism up, depth & light down — use sparingly.)
+
+## Calibration III — does the *whole process* beat naive prompting? (optflow, 24-image A/B)
+
+A third blind study tested the integrated process end-to-end. 4 subjects (2 story-capable: night noodle stall, elderly potter; 2 hard objects: skeleton wristwatch, honey jar) × 3 arms × 2 reps; 12 rater-sheets; each arm scored against the others in the same subject set by the same rater. The arms:
+- **N1 bare** — "A photo of {X}." (naive minimal)
+- **N2 render-spam** — "{X}, 8k, hyperrealistic, masterpiece, studio lighting, vibrant, cinematic, award-winning…" (the common naive "more quality words = better")
+- **OPT** — composed by THIS process (subject specifics first, mode-appropriate intent, light-via-scene, one lens anchor, no render-spam)
+
+Mean overall: **OPT 7.74 > N1 bare 6.52 > N2 render-spam 5.77.** Margins: **OPT − bare = +1.21** (biggest on emotion +1.8, light +1.3); **OPT − render-spam = +1.97** (biggest on realism +2.1, emotion +1.9). OPT won outright in **9 of 12** rater cells. **The process works — and render-spam is actively worse than writing nothing.**
+
+But the 3 losses were all on ONE subject, and they teach two things:
+
+1. **Render-spam's damage is SUBJECT-CLASS-dependent — it's a people problem.** On the two human subjects it craters realism (−1.2, the plastic/over-saturated skin tell). But on the isolated hard product (the watch) render-spam scored *highest* of all three arms — "sharp / studio / vivid" happens to align with catalog aesthetics, and the model's product defaults are already commercial-grade. So refine the iron rule: **render-spam is forbidden on anything with skin or a candid scene; on a lone hard-surface product it won't wreck the shot (and the bare prompt is already near-catalog) — but it also won't express anything.**
+
+2. **Mode discipline is load-bearing, and now it has a price tag.** The single subject where OPT *lost* (the watch, **−0.88** vs the best baseline) was where the OPT prompt leaked **Evocative** elements into a **Precise** subject — a mood line ("understated calm"), window light, and shallow depth-of-field. On a pure product that sacrifices the clean clarity the shot needs, and it lost to a plain catalog render. This is the measured cost of the "Evocative-on-a-lone-product = expensive emptiness" warning. **Hard-switch for pure products: studio clarity, full/deep focus, product dead-sharp, exact spec, NO mood / window-light / shallow-DoF.** Don't moodify a subject whose job is to be seen clearly. (The process wins big on story-capable subjects: noodle stall +1.3, potter +2.3, honey jar +1.8 — all driven by emotion + light, exactly where intent pays.)
