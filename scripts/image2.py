@@ -71,6 +71,23 @@ SESS_DIR = CODEX_HOME / "sessions"
 #                  "token": "...", "device": "mac"}
 COUNTER_CFG = Path(os.environ.get("IMAGE2_COUNTER_CONFIG", str(CODEX_HOME / "image2-counter.json")))
 
+
+def default_codex_bin() -> str:
+    """Pick the codex binary for image generation. Prefer a PINNED `codex-imggen` kept on a
+    known-good version, because the latest codex CLI has repeatedly regressed image_gen
+    (0.141.0 silently stopped firing it; 0.139.0 works). This lets the *main* `codex` track
+    latest for general/coding use while image gen stays on a frozen build. Falls back to the
+    main `codex` on PATH if no pinned binary is installed. Override with --codex-bin / $CODEX_BIN."""
+    if os.environ.get("IMAGE2_CODEX_BIN"):
+        return os.environ["IMAGE2_CODEX_BIN"]
+    for cand in (Path.home() / ".local/bin/codex-imggen",
+                 CODEX_HOME / "codex-imggen",
+                 CODEX_HOME / "codex-imggen.exe"):  # Windows
+        if cand.is_file() and os.access(cand, os.X_OK):
+            return str(cand)
+    return os.environ.get("CODEX_BIN", "codex")
+
+
 # Auto-concurrency thresholds on the primary (5h) window used_percent.
 SOFT_LIMIT = 70.0   # above this: cap parallelism to 2
 HARD_LIMIT = 90.0   # above this (or throttled): go serial
@@ -619,7 +636,8 @@ def main() -> None:
     ap.add_argument("--retries", type=int, default=1, help="retries if a job makes no image (default 1)")
     ap.add_argument("--timeout", type=int, default=360, help="per-job timeout seconds (default 360)")
     ap.add_argument("--force", action="store_true", help="overwrite existing output files")
-    ap.add_argument("--codex-bin", default=os.environ.get("CODEX_BIN", "codex"))
+    ap.add_argument("--codex-bin", default=default_codex_bin(),
+                    help="codex binary (default: pinned ~/.local/bin/codex-imggen if present, else `codex`)")
     ap.add_argument("--usage", action="store_true", help="print latest Codex usage/rate-limits and exit")
     ap.add_argument("--dry-run", action="store_true", help="print planned jobs and exit")
     args = ap.parse_args()
@@ -653,6 +671,7 @@ def main() -> None:
         why = f"manual x{conc}"
 
     log(f"image2: {len(jobs)} image(s) | concurrency={conc} ({why}) | out-dir={args.out_dir}")
+    log(f"  codex: {args.codex_bin}" + ("  (pinned image-gen build)" if "codex-imggen" in args.codex_bin else ""))
     log("  " + format_usage(pre).replace("\n", "\n  "))
     for j in jobs:
         refs = j.get("ref") or args.ref
